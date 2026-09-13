@@ -212,3 +212,24 @@ footer.site .fbrand{font-family:"Bevan",serif;font-size:22px;color:var(--white);
 .sub-head{font-size:20px;color:var(--white);margin-bottom:14px}
 .banner.wide{aspect-ratio:3/2}
 @media (max-width:640px){.banner.wide{aspect-ratio:1/1}}
+
+/* ============ layout polish ============ */
+
+/* keep the building from swallowing the screen on a big monitor */
+.frontage img{max-height:74vh;object-fit:cover;object-position:center 58%}
+@media (max-width:640px){
+  .frontage img{max-height:58vh;object-position:center 60%}
+}
+
+/* a little more air between sections on wide screens */
+@media (min-width:1100px){
+  section{padding:84px 0}
+  .wrap{padding:0 28px}
+  .plates{gap:26px}
+  .split{gap:64px}
+  .cols{gap:64px}
+}
+
+/* the nameplate shouldn't stretch edge to edge on a wide monitor */
+.nameplate h1{max-width:14ch;margin:0 auto}
+.nameplate p{max-width:40ch;margin-left:auto;margin-right:auto}

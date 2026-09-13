@@ -184,3 +184,41 @@
   background:rgba(111,217,142,.12);border-left:4px solid var(--neon);
   font-size:15px;line-height:1.5;
 }
+
+/* ============ layout polish ============ */
+
+/* the order page gets a wider canvas than the homepage */
+.order-layout{max-width:1200px}
+.order-status > .wrap{max-width:1200px}
+
+/* status block: one consistent rhythm instead of three stacked margins */
+.order-status{padding:30px 0 4px}
+.order-status .status{margin:0}
+.order-notice,
+.today-special{margin:14px 0 0;max-width:66ch}
+
+/* two columns of menu items once there's room for them */
+@media (min-width:1040px){
+  .order-layout{grid-template-columns:minmax(0,1fr) 360px;gap:56px}
+  .menu-list{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .menu-item + .menu-item{margin-top:0}
+  .menu-item{display:flex}
+  .menu-item-btn{align-items:flex-start}
+  .menu-section + .menu-section{margin-top:52px}
+}
+
+/* roomier dialog on desktop, edge-to-edge on phones */
+@media (min-width:700px){
+  .item-dialog-body{padding:6px 30px 24px}
+  .item-dialog-head{padding:26px 30px 18px}
+  .item-dialog-foot{padding:18px 30px}
+  .opt-options{grid-template-columns:1fr 1fr;gap:2px 14px}
+  .note-group textarea{margin-top:2px}
+}
+
+@media (max-width:640px){
+  .order-status{padding:22px 0 2px}
+  .order-layout{padding-top:18px;padding-bottom:40px}
+  .menu-item-btn{padding:14px 15px;gap:13px}
+  .cart-inner{padding:20px 17px}
+}

@@ -51,7 +51,7 @@
     }
     var s = Hours.state();
     if (!s.open) {
-      return { ok: false, reason: s.text + ". You can still build an order and call it in." };
+      return { ok: false, reason: "Build your order now and call it in when we open, or come sit down." };
     }
     var minsLeft = s.closesAt - s.nowMins;
     if (minsLeft < CFG.lastOrderBeforeCloseMinutes) {
@@ -493,7 +493,7 @@
     var text = CFG.dailySpecials[Hours.now().day];
     if (!text) { el2.hidden = true; return; }
     el2.hidden = false;
-    el2.textContent = text + " Applied at the bar when you pay.";
+    el2.textContent = text;
   }
 
   function showWindowNotice() {
