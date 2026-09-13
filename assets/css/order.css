@@ -275,3 +275,47 @@
   background:rgba(111,217,142,.09);
   border-left:3px solid var(--neon);
 }
+
+/* ============ mobile dialog: keep the buttons on screen ============
+
+   The sheet used to be a fixed 100vh. On iOS, 100vh measures the viewport
+   *behind* Safari's toolbars, so the footer with Qty / Add / Cancel ended up
+   below the fold and you had to scroll to reach it. Two changes fix it:
+   the sheet now sizes to its content instead of stretching, and it's capped
+   in dvh (dynamic viewport height), which excludes the browser chrome. */
+
+.item-dialog{
+  max-height:86vh;      /* fallback for older browsers */
+  max-height:86dvh;
+  height:auto;
+}
+.item-dialog-body{flex:0 1 auto;min-height:0}
+
+@media (max-width:640px){
+  .item-dialog{
+    width:100vw;
+    max-width:100vw;
+    height:auto;
+    max-height:90vh;
+    max-height:90dvh;
+    /* sit on the bottom edge like a sheet rather than floating centred */
+    margin:auto 0 0;
+    border-radius:12px 12px 0 0;
+  }
+  .item-dialog-head{padding:18px 20px 14px}
+  .item-dialog-body{padding:4px 20px 14px}
+  .item-dialog-foot{
+    position:static;
+    padding:14px 20px calc(14px + env(safe-area-inset-bottom));
+    gap:10px;
+  }
+  .item-dialog-foot #addToOrder{flex:1 1 auto;min-width:120px}
+  .item-dialog-foot .btn{padding:13px 18px}
+  .qty input{width:56px}
+  /* shorter note box so it doesn't push the buttons down */
+  .note-group textarea{min-height:0}
+  #itemNote{height:62px}
+}
+
+/* the sticky cart bar shouldn't peek out from under an open sheet */
+body:has(dialog[open]) .cart-bar{display:none}

@@ -233,3 +233,6 @@ footer.site .fbrand{font-family:"Bevan",serif;font-size:22px;color:var(--white);
 /* the nameplate shouldn't stretch edge to edge on a wide monitor */
 .nameplate h1{max-width:14ch;margin:0 auto}
 .nameplate p{max-width:40ch;margin-left:auto;margin-right:auto}
+
+/* photo credit */
+footer.site .credit{display:inline-block;margin-top:10px;font-size:13.5px;color:rgba(240,240,233,.55)}

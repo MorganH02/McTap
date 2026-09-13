@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://mctap.com/sitemap.xml
+Sitemap: https://mctapbar.com/sitemap.xml
