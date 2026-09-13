@@ -252,3 +252,26 @@
   .cart-inner{padding:24px 22px}
   .cart h2{font-size:23px}
 }
+
+/* ============ one status signal, not two ============
+
+   The pill above already carries the red dot and the "closed" wording. The
+   notice underneath only needs to say what to do about it, so it drops the
+   red bar and box and reads as quiet secondary text. */
+.order-notice{
+  background:none;
+  border-left:0;
+  padding:0;
+  margin:12px 0 0;
+  color:rgba(240,240,233,.72);
+  font-size:15.5px;
+}
+
+/* the special is different information, so it keeps a light marker —
+   but a quieter one now that it's the only box in the stack */
+.today-special{
+  margin:16px 0 0;
+  padding:12px 17px;
+  background:rgba(111,217,142,.09);
+  border-left:3px solid var(--neon);
+}
