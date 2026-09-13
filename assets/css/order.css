@@ -222,3 +222,33 @@
   .menu-item-btn{padding:14px 15px;gap:13px}
   .cart-inner{padding:20px 17px}
 }
+
+/* ============ card alignment ============ */
+
+/* Only some items have a photo, which left prices sitting at different
+   heights across a row. Push the price line to the bottom of every card so
+   they line up whether there's a thumbnail or not. */
+.menu-item-body{display:flex;flex-direction:column;min-width:0}
+.menu-item-meta{margin-top:auto;padding-top:10px}
+.menu-item-body h3{font-size:16.5px;line-height:1.18;overflow-wrap:break-word}
+
+/* equal-height cards in a row */
+.menu-item{display:flex}
+.menu-item-btn{width:100%;align-items:stretch}
+.menu-item-thumb{align-self:flex-start;width:68px;height:68px}
+.menu-item-add{align-self:center}
+
+@media (min-width:1040px){
+  .menu-item-btn{min-height:116px}
+  .menu-list{gap:14px}
+}
+
+/* the status blocks were rendering at slightly different widths */
+.order-notice,
+.today-special{display:block;width:100%;max-width:64ch;box-sizing:border-box}
+
+/* keep the sticky cart from floating alone in a tall empty column */
+@media (min-width:1040px){
+  .cart-inner{padding:24px 22px}
+  .cart h2{font-size:23px}
+}
