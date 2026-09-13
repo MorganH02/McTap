@@ -2,6 +2,8 @@
 
 Website for MC Tap, a tavern at 303 Pacific Street, Monroe Center, Illinois.
 
+https://morganh02.github.io/McTap/
+
 Plain HTML, CSS and JavaScript. No build step, no framework, no dependencies. Open `index.html` in a browser and it works.
 
 ## Structure
