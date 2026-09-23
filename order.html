@@ -1,184 +1,182 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Order online — MC Tap, Monroe Center, Illinois</title>
+  <meta name="description" content="Order a burger for pickup from MC Tap in Monroe Center, Illinois. Make substitutions, pick a time, pay when you get here.">
+  <meta name="robots" content="index, follow">
+  <meta name="theme-color" content="#2A4A34">
+  <link rel="icon" href="images/favicon.svg" type="image/svg+xml">
 
-<title>Order online — MC Tap, Monroe Center, Illinois</title>
-<meta name="description" content="Order a burger for pickup from MC Tap in Monroe Center, Illinois. Make substitutions, pick a time, pay when you get here.">
-<meta name="robots" content="index, follow">
-<meta name="theme-color" content="#2A4A34">
-
-<link rel="icon" href="images/favicon.svg" type="image/svg+xml">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bevan&family=Archivo:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/css/styles.css">
-<link rel="stylesheet" href="assets/css/order.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bevan&family=Archivo:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/styles.css">
+  <link rel="stylesheet" href="assets/css/order.css">
 </head>
 <body class="page-order">
+  <a class="skip" href="#main">Skip to content</a>
 
-<a class="skip" href="#main">Skip to content</a>
+  <header class="masthead">
+    <nav aria-label="Main">
+      <a href="index.html">Home</a>
+      <a href="index.html#drinks">Drinks</a>
+      <a href="index.html#hours">Hours</a>
+      <a href="index.html#find">Find us</a>
+    </nav>
+    <a class="callnow" href="tel:+18153933503">Call (815)&nbsp;393-3503</a>
+  </header>
 
-<header class="masthead">
-  <nav aria-label="Main">
-    <a href="index.html">Home</a>
-    <a href="index.html#drinks">Drinks</a>
-    <a href="index.html#hours">Hours</a>
-    <a href="index.html#find">Find us</a>
-  </nav>
-  <a class="callnow" href="tel:+18153933503">Call (815)&nbsp;393-3503</a>
-</header>
+  <!-- Notice banner: shows when "Notice banner" on the sheet's Words tab has text. -->
+  <div class="sheet-notice" data-sheet="notice" role="status" hidden></div>
 
-<div class="nameplate nameplate-sm">
-  <h1>Order ahead</h1>
-  <p>Pickup only. Pay when you get here.</p>
-</div>
-
-<p id="priceWarning" class="price-warning" hidden>
-  <strong>Not live yet.</strong> The prices on this page are placeholders. Replace them in
-  <code>assets/js/menu.js</code> and set <code>pricesConfirmed: true</code> to clear this message.
-</p>
-
-<div class="order-status">
-  <div class="wrap">
-    <div class="status">
-      <span class="dot" id="dot" aria-hidden="true"></span>
-      <span id="statusText">Checking today's hours…</span>
-    </div>
-    <p id="orderNotice" class="order-notice" role="status" hidden></p>
-    <p id="todaySpecial" class="today-special" hidden></p>
+  <div class="nameplate nameplate-sm">
+    <h1>Order ahead</h1>
+    <p>Pickup only. Pay when you get here.</p>
   </div>
-</div>
 
-<main id="main">
+  <p id="priceWarning" class="price-warning" hidden>
+    <strong>Not live yet.</strong> The prices on this page are placeholders. Replace them in
+    <code>assets/js/menu.js</code> and set <code>pricesConfirmed: true</code> to clear this message.
+  </p>
 
-<!-- ============================ STEP 1: build the order ==================== -->
-<div id="orderStep">
-  <div class="wrap order-layout">
-
-    <div class="order-menu">
-      <div id="menuRoot"></div>
-      <noscript>
-        <p class="order-notice">Online ordering needs JavaScript. Call (815) 393-3503 and we'll take your order over the phone.</p>
-      </noscript>
+  <div class="order-status">
+    <div class="wrap">
+      <div class="status">
+        <span class="dot" id="dot" aria-hidden="true"></span>
+        <span id="statusText">Checking today's hours…</span>
+      </div>
+      <p id="orderNotice" class="order-notice" role="status" hidden></p>
+      <p id="todaySpecial" class="today-special" hidden></p>
     </div>
+  </div>
 
-    <aside class="cart" id="cartPanel" aria-label="Your order">
-      <div class="cart-inner">
-        <h2>Your order</h2>
-        <p id="cartEmpty" class="cart-empty">Nothing in here yet. Tap something on the menu to get started.</p>
-        <ul id="cartLines" class="cart-lines"></ul>
+  <!-- data-sheet-use: sheet.js loads these tabs for order.js to use -->
+  <main id="main" data-sheet-use="menu specials words">
 
-        <div id="cartTotals" class="cart-totals" hidden>
-          <div class="row"><span>Subtotal</span><span id="cartSubtotal">$0.00</span></div>
-          <div class="row muted" id="taxRow" hidden><span>Tax</span><span id="cartTax">$0.00</span></div>
-          <div class="row muted" id="taxNote"><span>Tax</span><span>added at the bar</span></div>
-          <div class="row total"><span>Total</span><span id="cartTotal">$0.00</span></div>
-          <p class="cart-fineprint">You pay at the bar when you pick up. Nothing is charged here.</p>
+    <!-- ============================ STEP 1: build the order ==================== -->
+    <div id="orderStep">
+      <div class="wrap order-layout">
+        <div class="order-menu">
+          <div id="menuRoot"></div>
+          <noscript>
+            <p class="order-notice">Online ordering needs JavaScript. Call (815) 393-3503 and we'll take your order over the phone.</p>
+          </noscript>
         </div>
 
-        <button type="button" id="toCheckout" class="btn solid full" disabled>Continue</button>
-      </div>
-    </aside>
-
-  </div>
-</div>
-
-<!-- ============================ STEP 2: who and when ====================== -->
-<div id="checkoutStep" hidden>
-  <div class="wrap narrow">
-    <button type="button" id="backToMenu" class="linkback">Back to the menu</button>
-    <h2 class="sec-head">Almost done</h2>
-    <p class="sec-note">We need a name to shout and a number to call if something's off.</p>
-
-    <form id="checkoutForm" class="checkout-form" novalidate>
-      <label for="custName">Name</label>
-      <input type="text" id="custName" name="name" autocomplete="name" required maxlength="60">
-
-      <label for="custPhone">Phone number</label>
-      <input type="tel" id="custPhone" name="phone" autocomplete="tel" required maxlength="20" placeholder="815-555-0100">
-
-      <label for="pickupTime">Pickup time</label>
-      <select id="pickupTime" name="pickup"></select>
-
-      <label for="orderNote">Anything else?</label>
-      <textarea id="orderNote" name="note" rows="3" maxlength="300" placeholder="Running late, paying cash, extra ranch — whatever it is"></textarea>
-
-      <p class="send-status" id="sendStatus" role="status"></p>
-      <button type="submit" id="placeOrder" class="btn solid full">Place order</button>
-      <p class="cart-fineprint">No payment is taken on this page. You pay at the bar.</p>
-    </form>
-  </div>
-</div>
-
-<!-- ============================ STEP 3: confirmation ====================== -->
-<div id="doneStep" hidden>
-  <div class="wrap narrow">
-    <h2 class="sec-head" id="doneHeadline">Order sent</h2>
-    <p class="sec-note" id="doneBlurb"></p>
-
-    <div id="handoff" class="handoff">
-      <div class="btnrow">
-        <a class="btn solid" id="sendText" href="#" hidden>Send by text</a>
-        <a class="btn ghost" id="sendEmail" href="#" hidden>Send by email</a>
-        <button type="button" class="btn solid" id="copyTicket">Copy order</button>
-        <a class="btn ghost" id="callItIn" href="tel:+18153933503">Call it in</a>
+        <aside class="cart" id="cartPanel" aria-label="Your order">
+          <div class="cart-inner">
+            <h2>Your order</h2>
+            <p id="cartEmpty" class="cart-empty">Nothing in here yet. Tap something on the menu to get started.</p>
+            <ul id="cartLines" class="cart-lines"></ul>
+            <div id="cartTotals" class="cart-totals" hidden>
+              <div class="row"><span>Subtotal</span><span id="cartSubtotal">$0.00</span></div>
+              <div class="row muted" id="taxRow" hidden><span>Tax</span><span id="cartTax">$0.00</span></div>
+              <div class="row muted" id="taxNote"><span>Tax</span><span>added at the bar</span></div>
+              <div class="row total"><span>Total</span><span id="cartTotal">$0.00</span></div>
+              <p class="cart-fineprint">You pay at the bar when you pick up. Nothing is charged here.</p>
+            </div>
+            <button type="button" id="toCheckout" class="btn solid full" disabled>Continue</button>
+          </div>
+        </aside>
       </div>
     </div>
 
-    <pre class="ticket" id="ticket"></pre>
+    <!-- ============================ STEP 2: who and when ====================== -->
+    <div id="checkoutStep" hidden>
+      <div class="wrap narrow">
+        <button type="button" id="backToMenu" class="linkback">Back to the menu</button>
+        <h2 class="sec-head">Almost done</h2>
+        <p class="sec-note">We need a name to shout and a number to call if something's off.</p>
 
-    <div class="btnrow">
-      <a class="btn ghost" href="order.html">Start another order</a>
-      <a class="btn ghost" href="index.html">Back to the site</a>
+        <form id="checkoutForm" class="checkout-form" novalidate>
+          <label for="custName">Name</label>
+          <input type="text" id="custName" name="name" autocomplete="name" required maxlength="60">
+
+          <label for="custPhone">Phone number</label>
+          <input type="tel" id="custPhone" name="phone" autocomplete="tel" required maxlength="20" placeholder="815-555-0100">
+
+          <label for="pickupTime">Pickup time</label>
+          <select id="pickupTime" name="pickup"></select>
+
+          <label for="orderNote">Anything else?</label>
+          <textarea id="orderNote" name="note" rows="3" maxlength="300" placeholder="Running late, paying cash, extra ranch — whatever it is"></textarea>
+
+          <p class="send-status" id="sendStatus" role="status"></p>
+          <button type="submit" id="placeOrder" class="btn solid full">Place order</button>
+          <p class="cart-fineprint">No payment is taken on this page. You pay at the bar.</p>
+        </form>
+      </div>
     </div>
-  </div>
-</div>
 
-</main>
+    <!-- ============================ STEP 3: confirmation ====================== -->
+    <div id="doneStep" hidden>
+      <div class="wrap narrow">
+        <h2 class="sec-head" id="doneHeadline">Order sent</h2>
+        <p class="sec-note" id="doneBlurb"></p>
 
-<!-- sticky bar on phones so the cart is always one tap away -->
-<div class="cart-bar" id="cartBar" hidden>
-  <button type="button" id="cartBarBtn">
-    <span id="cartBarCount">0 items</span>
-    <span id="cartBarTotal">$0.00</span>
-  </button>
-</div>
+        <div id="handoff" class="handoff">
+          <div class="btnrow">
+            <a class="btn solid" id="sendText" href="#" hidden>Send by text</a>
+            <a class="btn ghost" id="sendEmail" href="#" hidden>Send by email</a>
+            <button type="button" class="btn solid" id="copyTicket">Copy order</button>
+            <a class="btn ghost" id="callItIn" href="tel:+18153933503">Call it in</a>
+          </div>
+        </div>
 
-<!-- item customization -->
-<dialog id="itemDialog" class="item-dialog" aria-labelledby="itemDialogTitle">
-  <div class="item-dialog-head">
-    <h2 id="itemDialogTitle">Item</h2>
-    <p id="itemDialogDesc" class="item-dialog-desc"></p>
-  </div>
+        <pre class="ticket" id="ticket"></pre>
 
-  <div class="item-dialog-body">
-    <form id="itemForm"></form>
-  </div>
+        <div class="btnrow">
+          <a class="btn ghost" href="order.html">Start another order</a>
+          <a class="btn ghost" href="index.html">Back to the site</a>
+        </div>
+      </div>
+    </div>
 
-  <div class="item-dialog-foot">
-    <label class="qty">
-      <span>Qty</span>
-      <input type="number" id="itemQty" value="1" min="1" max="20" inputmode="numeric">
-    </label>
-    <button type="button" id="addToOrder" class="btn solid">
-      Add <span id="itemTotal">$0.00</span>
+  </main>
+
+  <!-- sticky bar on phones so the cart is always one tap away -->
+  <div class="cart-bar" id="cartBar" hidden>
+    <button type="button" id="cartBarBtn">
+      <span id="cartBarCount">0 items</span>
+      <span id="cartBarTotal">$0.00</span>
     </button>
-    <button type="button" id="cancelItem" class="btn ghost">Cancel</button>
   </div>
-</dialog>
 
-<footer class="site">
-  <div class="wrap">
-    <span class="fbrand">MC Tap</span>
-    303 Pacific Street, Monroe Center, Illinois 61052 &nbsp;|&nbsp; <a href="tel:+18153933503">(815) 393-3503</a><br>
-    Must be 21 to sit at the bar.
-  </div>
-</footer>
+  <!-- item customization -->
+  <dialog id="itemDialog" class="item-dialog" aria-labelledby="itemDialogTitle">
+    <div class="item-dialog-head">
+      <h2 id="itemDialogTitle">Item</h2>
+      <p id="itemDialogDesc" class="item-dialog-desc"></p>
+    </div>
+    <div class="item-dialog-body">
+      <form id="itemForm"></form>
+    </div>
+    <div class="item-dialog-foot">
+      <label class="qty">
+        <span>Qty</span>
+        <input type="number" id="itemQty" value="1" min="1" max="20" inputmode="numeric">
+      </label>
+      <button type="button" id="addToOrder" class="btn solid">
+        Add <span id="itemTotal">$0.00</span>
+      </button>
+      <button type="button" id="cancelItem" class="btn ghost">Cancel</button>
+    </div>
+  </dialog>
 
-<script src="assets/js/hours.js"></script>
-<script src="assets/js/menu.js"></script>
-<script src="assets/js/order.js" defer></script>
+  <footer class="site">
+    <div class="wrap">
+      <span class="fbrand">MC Tap</span>
+      303 Pacific Street, Monroe Center, Illinois 61052 &nbsp;|&nbsp; <a href="tel:+18153933503">(815) 393-3503</a><br>
+      Must be 21 to sit at the bar.
+    </div>
+  </footer>
+
+  <script src="assets/js/hours.js"></script>
+  <script src="assets/js/menu.js"></script>
+  <!-- sheet.js must come before order.js -->
+  <script src="assets/js/sheet.js" defer></script>
+  <script src="assets/js/order.js" defer></script>
 </body>
 </html>
