@@ -42,9 +42,9 @@
 
   // ---- Paste the published CSV links here ---------------------------------
   var SHEET_LINKS = {
-    menu:     '',   // the Menu tab
-    specials: '',   // the Specials tab
-    words:    ''    // the Words tab
+    menu:     'https://docs.google.com/spreadsheets/d/e/2PACX-1vR_ZenMIOs7QmKL9DyUu9VVZ_kQ4D-FAUXv0dk5RXn5Psadg8Zc7KYrBWyGid5PITF8abssOek0UYWJ/pub?gid=581120479&single=true&output=csv',   // the Menu tab
+    specials: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vR_ZenMIOs7QmKL9DyUu9VVZ_kQ4D-FAUXv0dk5RXn5Psadg8Zc7KYrBWyGid5PITF8abssOek0UYWJ/pub?gid=704290154&single=true&output=csv',   // the Specials tab
+    words:    'https://docs.google.com/spreadsheets/d/e/2PACX-1vR_ZenMIOs7QmKL9DyUu9VVZ_kQ4D-FAUXv0dk5RXn5Psadg8Zc7KYrBWyGid5PITF8abssOek0UYWJ/pub?gid=1241910556&single=true&output=csv'    // the Words tab
   };
   // -------------------------------------------------------------------------
 
