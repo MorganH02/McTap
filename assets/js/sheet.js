@@ -19,6 +19,9 @@
  *   data-sheet="specials-drinks"  the Drinks specials <ul>
  *   data-sheet="notice"           empty banner; shows when "Notice banner" has text
  *   data-text="Spot name"         any element whose words come from the Words tab
+ *   data-sheet-use="menu specials words"
+ *                                 load those tabs for other scripts, even with nothing
+ *                                 above on the page (order.html uses this for order.js)
  *
  * TESTING
  *   Add ?sheet=off to the address to see the page without the sheet.
@@ -26,7 +29,12 @@
  *
  * FOR OTHER SCRIPTS
  *   window.MCTAP_SHEET.ready   a Promise that resolves once loading finishes
- *   window.MCTAP_SHEET.data    { menu, specials, words } as parsed
+ *   window.MCTAP_SHEET.data    what loaded, or null for a part that didn't:
+ *     .menu      { groups: [...as shown on the board],
+ *                  items:  [{ section, name, details, price (number or null), shown }] }
+ *                items includes hidden rows, so a hidden item can be pulled from ordering
+ *     .specials  [{ type, day, special, show }]  only rows shown on the site
+ *     .words     { spotname: text }  spot names lowercased with spaces and punctuation removed
  *   document event 'mctap:sheet' fires each time a part is applied
  */
 (function () {
@@ -79,11 +87,15 @@
     return;
   }
 
-  // Only fetch what this page actually shows.
+  // Only fetch what this page uses. A page with no board or lists can still
+  // ask for a tab with data-sheet-use="menu specials words" (order.html does).
+  function uses(part) {
+    return !!document.querySelector('[data-sheet-use~="' + part + '"]');
+  }
   var need = {
-    menu:     !!document.querySelector('[data-sheet="menu"]'),
-    specials: !!document.querySelector('[data-sheet^="specials-"]'),
-    words:    !!document.querySelector('[data-text], [data-sheet="notice"]')
+    menu:     uses('menu') || !!document.querySelector('[data-sheet="menu"]'),
+    specials: uses('specials') || !!document.querySelector('[data-sheet^="specials-"]'),
+    words:    uses('words') || !!document.querySelector('[data-text], [data-sheet="notice"]')
   };
 
   // ---- Reading the sheet ---------------------------------------------------
@@ -145,6 +157,11 @@
     return null;
   }
 
+  function toNumber(v) {
+    var n = String(v || '').replace(/[\s$,]/g, '');
+    return /^\d+(\.\d+)?$/.test(n) ? Number(n) : null;
+  }
+
   function formatPrice(v) {
     var n = String(v || '').replace(/[\s$,]/g, '');
     if (/^\d+(\.\d+)?$/.test(n)) return '$' + Number(n).toFixed(2);
@@ -155,23 +172,30 @@
 
   var BUILD = {
     menu: function (rows) {
-      var groups = [], bySection = {}, last = '';
+      var groups = [], bySection = {}, items = [], last = '';
       rows.forEach(function (r) {
         var section = r.section || last;   // a blank Section means "same as the row above"
         if (!section) return;
         last = section;
-        if (!shown(r.show)) return;
+        var isNote = !r.item || /^(section)?note$/.test(norm(r.item));
+        var visible = shown(r.show);
+        if (!isNote) {
+          // every item, hidden ones included, so the order page knows what's 86'd
+          items.push({ section: section, name: r.item, details: r.details,
+                       price: toNumber(r.price), shown: visible });
+        }
+        if (!visible) return;
         var key = norm(section);
         var g = bySection[key];
         if (!g) { g = bySection[key] = { title: section, note: '', items: [] }; groups.push(g); }
-        if (!r.item || /^(section)?note$/.test(norm(r.item))) {
+        if (isNote) {
           if (r.details) g.note = r.details;
           return;
         }
         g.items.push({ name: r.item, details: r.details, price: formatPrice(r.price) });
       });
       groups = groups.filter(function (g) { return g.items.length; });
-      return groups.length ? groups : null;
+      return groups.length ? { groups: groups, items: items } : null;
     },
 
     specials: function (rows) {
@@ -197,7 +221,8 @@
   }
 
   var RENDER = {
-    menu: function (groups) {
+    menu: function (model) {
+      var groups = model.groups;
       var board = document.querySelector('[data-sheet="menu"]');
       if (!board) return;
       var kids = Array.prototype.slice.call(board.children), anchor = null;

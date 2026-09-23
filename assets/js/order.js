@@ -4,6 +4,11 @@
    Menu items and prices live in menu.js. Opening hours live in hours.js.
    This file only handles the interface, the cart maths, and sending.
 
+   When the Google Sheet is set up (see sheet.js and SHEET-SETUP.md), its
+   prices, 86'd items, specials and the ordering pause are laid over menu.js
+   before the menu is drawn. If the sheet can't be read, this page runs on
+   menu.js exactly as before. See "THE GOOGLE SHEET" below.
+
    Nothing is stored between visits and no payment is taken here. The order
    is composed in the browser and handed off. Where it goes is set by
    MCTAP_CONFIG.endpoint in menu.js — see sendOrder() at the bottom.
@@ -19,6 +24,7 @@
      behaviour we want for a takeout order */
   var cart = [];
   var lineSeq = 0;
+  var booted = false;
 
   /* ---------------------------------------------------------------- utils */
 
@@ -40,6 +46,176 @@
       }
     }
     return null;
+  }
+
+  function copy(obj, changes) {
+    var out = {}, k;
+    for (k in obj) out[k] = obj[k];
+    for (k in changes) out[k] = changes[k];
+    return out;
+  }
+
+  /* ---------------------------------------------------- THE GOOGLE SHEET
+     menu.js stays the source for everything the sheet doesn't cover: option
+     groups and their prices, descriptions, photos, section notes, and any
+     item that isn't on the sheet (the Thursday tacos).
+
+     From the Menu tab
+       - each item's price, matched by name. "Boneless Wings" + Details
+         "Half pound" matches "Boneless Wings, half pound".
+       - Show = No (or a price that isn't a number) takes it off this page
+       - items menu.js doesn't have are added as plain items, no options
+       - Tap Bites prices also set the matching "Add a side?" prices
+     From the Specials tab: the "today's special" line
+     From the Words tab: "Online ordering" set to Paused stops orders.
+       menu.js orderingPaused: true still stops them no matter what.
+     ---------------------------------------------------------------------- */
+
+  var BASE = {
+    menu: MENU,
+    specials: CFG.dailySpecials,
+    paused: !!CFG.orderingPaused
+  };
+  var DAY_NAMES = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+  var PAUSE_WORDS = ["paused", "pause", "off", "no", "closed", "stop", "stopped"];
+
+  function key(s) {
+    return String(s || "").toLowerCase().replace(/[^a-z0-9]/g, "");
+  }
+
+  function menuFromSheet(sheetMenu) {
+    if (!sheetMenu || !sheetMenu.items) return BASE.menu;
+    var rows = sheetMenu.items;
+    var byFull = {}, byName = {}, nameCount = {}, used = [];
+
+    rows.forEach(function (r) {
+      var n = key(r.name);
+      byFull[key(r.name + r.details)] = r;
+      byName[n] = r;
+      nameCount[n] = (nameCount[n] || 0) + 1;
+    });
+
+    function match(name) {
+      var k = key(name);
+      if (byFull[k]) return byFull[k];
+      if (nameCount[k] === 1) return byName[k];
+      return null;
+    }
+
+    function orderable(r) {
+      return r.shown && typeof r.price === "number";
+    }
+
+    /* "Add a side?" follows the Tap Bites rows: same price, gone when 86'd */
+    function syncGroups(groups) {
+      if (!groups) return groups;
+      return groups.map(function (g) {
+        if (g.id !== "side") return g;
+        var options = [];
+        g.options.forEach(function (o) {
+          var r = match(o.label);
+          if (!r) options.push(o);
+          else if (orderable(r)) options.push({ label: o.label, price: r.price });
+        });
+        return copy(g, { options: options });
+      });
+    }
+
+    var menu = BASE.menu.map(function (section) {
+      var items = [];
+      section.items.forEach(function (item) {
+        var r = match(item.name);
+        if (r) used.push(r);
+        if (r && !orderable(r)) return;
+        items.push(copy(item, {
+          price: r ? r.price : item.price,
+          groups: syncGroups(item.groups)
+        }));
+      });
+      return copy(section, { items: items });
+    });
+
+    /* anything new on the sheet goes in its section, or a new one at the end */
+    var ids = {};
+    rows.forEach(function (r) {
+      if (used.indexOf(r) >= 0 || !orderable(r)) return;
+      var sk = key(r.section), section = null;
+      menu.forEach(function (s) { if (key(s.name) === sk) section = s; });
+      if (!section) {
+        section = { id: "sheet-" + sk, name: r.section, items: [] };
+        menu.push(section);
+      }
+      var id = "sheet-" + sk + "-" + key(r.name + r.details);
+      while (ids[id]) id += "x";
+      ids[id] = true;
+      section.items.push({ id: id, name: r.name, desc: r.details, price: r.price, groups: [] });
+    });
+
+    return menu;
+  }
+
+  function specialsFromSheet(rows) {
+    if (!rows) return BASE.specials;
+    var byDay = DAY_NAMES.map(function () { return []; });
+    var drinks = DAY_NAMES.map(function () { return []; });
+    rows.forEach(function (r) {
+      var d = key(r.day);
+      var list = key(r.type).indexOf("food") === 0 ? byDay : drinks;
+      DAY_NAMES.forEach(function (name, i) {
+        if (d === "daily" || d === "everyday" || d.indexOf(key(name).slice(0, 3)) === 0) {
+          list[i].push(r.special);
+        }
+      });
+    });
+    return DAY_NAMES.map(function (name, i) {
+      var all = byDay[i].concat(drinks[i]);
+      if (!all.length) return "";
+      return name + ": " + all.map(function (t) {
+        t = t.trim();
+        return /[.!?]$/.test(t) ? t : t + ".";
+      }).join(" ");
+    });
+  }
+
+  function pausedFromSheet(words) {
+    return !!words && PAUSE_WORDS.indexOf(key(words.onlineordering)) >= 0;
+  }
+
+  /* If prices change after something is in the cart, the cart follows. */
+  function repriceCart() {
+    cart.forEach(function (line) {
+      var item = findItem(line.id);
+      if (!item) return;
+      var extra = 0;
+      line.options.forEach(function (o) {
+        (item.groups || []).forEach(function (g) {
+          g.options.forEach(function (go) { if (go.label === o.label) o.price = go.price; });
+        });
+        extra += o.price;
+      });
+      line.base = item.price;
+      line.each = item.price + extra;
+    });
+  }
+
+  function useSheet(part, data) {
+    if (part === "menu") MENU = menuFromSheet(data);
+    else if (part === "specials") CFG.dailySpecials = specialsFromSheet(data);
+    else if (part === "words") CFG.orderingPaused = BASE.paused || pausedFromSheet(data);
+    else return;
+
+    if (!booted) return;   // the first render picks it up
+    if (part === "menu") {
+      renderMenu();
+      repriceCart();
+      if (currentItem) {
+        currentItem = findItem(currentItem.id) || currentItem;
+        updateDialogTotal();
+      }
+    }
+    renderCart();
+    showWindowNotice();
+    showTodaysSpecial();
   }
 
   /* ------------------------------------------------------- ordering window */
@@ -78,6 +254,7 @@
     root.innerHTML = "";
 
     MENU.forEach(function (section) {
+      if (!section.items.length) return;   // everything in it is 86'd
       var wrapper = el("section", "menu-section");
       wrapper.id = "sec-" + section.id;
 
@@ -513,6 +690,9 @@
   }
 
   function boot() {
+    if (booted) return;
+    booted = true;
+
     if (!CFG.pricesConfirmed) {
       document.getElementById("priceWarning").hidden = false;
     }
@@ -549,9 +729,33 @@
     }, 60000);
   }
 
+  /* sheet.js loads before this file. Whatever it already has (its saved copy
+     from a previous visit) goes in before the first render. A fresh copy is
+     given a moment to arrive so prices don't change under a first-time
+     visitor; if it's slower than that, the page starts on menu.js and
+     updates in place when the sheet arrives. */
+  function start() {
+    var S = window.MCTAP_SHEET;
+    if (!S) { boot(); return; }
+
+    ["menu", "specials", "words"].forEach(function (part) {
+      if (S.data[part]) useSheet(part, S.data[part]);
+    });
+    document.addEventListener("mctap:sheet", function (e) {
+      useSheet(e.detail.part, e.detail.data);
+    });
+
+    var root = document.getElementById("menuRoot");
+    root.innerHTML = "";
+    root.appendChild(el("p", "menu-section-note", "Loading the menu\u2026"));
+
+    S.ready.then(boot);
+    setTimeout(boot, 1500);
+  }
+
   if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", boot);
+    document.addEventListener("DOMContentLoaded", start);
   } else {
-    boot();
+    start();
   }
 })();
